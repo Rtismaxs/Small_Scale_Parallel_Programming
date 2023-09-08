@@ -1,0 +1,74 @@
+#!/bin/bash
+##
+## MPI submission script for PBS on CRESCENT
+## -----------------------------------------
+##
+## Follow the 5 steps below to configure. If you edit this from Windows,
+## *before* submitting via "qsub" run "dos2unix" on this file - or you will
+## get strange errors. You have been warned.
+## 
+## STEP 1:
+##
+## Enter a job name after the -N on the line below:
+##
+#PBS -N openMP_Mathis 
+##
+## STEP 2:
+##
+## The select line below selects 1 chunk of 4 cpus 
+## Make sure to match ncpus to the number of threads 
+##
+#PBS -l select=1:ncpus=16:mpiprocs=1
+##
+## STEP 3:
+##
+## Select correct queue:
+##    reserved  queue reserved for this course
+##
+##
+## STEP 4:
+##
+## Replace the hpc@cranfield.ac.uk email address
+## with your email address after the -M on the line below:
+## Your email address is NOT your username
+##
+#PBS -m abe 
+#PBS -M mathis.cadier.430@cranfield.ac.uk
+##
+##
+##
+## DO NOT CHANGE the following lines
+##------------------------------------------------
+#PBS -j oe
+#PBS -W sandbox=PRIVATE
+#PBS -k n
+ln -s $PWD $PBS_O_WORKDIR/$PBS_JOBID
+##
+## Change to working directory
+cd $PBS_O_WORKDIR
+##
+## Calculate number of CPUs
+export cpus=`cat $PBS_NODEFILE | wc -l`
+##
+##
+##-------------------------------------------------
+##
+## STEP 5: 
+## Run the application
+##
+
+for t in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+    do
+        echo "Number of threads: $t"
+        export OMP_NUM_THREADS=$t
+        ./a_matrix_vector_unroll_4 Cube_Coup_dt0.mtx
+    done
+
+##for n in cage4.mtx mhda416.mtx mcfe.mtx olm1000.mtx adder_dcop_32.mtx west2021.mtx cavity10.mtx rdist2.mtx cant.mtx olafu.mtx Cube_Coup_dt0.mtx ML_Laplace.mtx bcsstk17.mtx mac_econ_fwd500.mtx mhd4800a.mtx cop20k_A.mtx raefsky2.mtx af23560.mtx lung2.mtx PR02R.mtx FEM_3D_thermal1.mtx thermal1.mtx thermal2.mtx thermomech_TK.mtx nlpkkt80.mtx amazon0302.mtx af_1_k101.mtx roadNet-PA.mtx
+##do
+##      echo "Matrix: $n"
+##      export OMP_NUM_THREADS=16
+##      ./a_matrix_vector_unroll_4 $n
+##done
+
+/bin/rm -f ./$PBS_JOBID
